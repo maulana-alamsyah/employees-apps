@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Employees Apps</title>
+
+    <link href="../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body>
+    <div
+      class="container d-flex justify-content-center align-items-center vh-100"
+    >
+      <div class="card w-50">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h1 class="text-center">
+                Formulir Tambah Data
+                <hr class="w-50 mx-auto mt-2 bg-dark" size="2" />
+              </h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label for="nip">NIP</label>
+              <input type="text" id="nip" class="form-control" />
+              <label for="nama">Nama</label>
+              <input type="text" id="nama" class="form-control" />
+              <label for="alamat">Alamat</label>
+              <input type="text" id="alamat" class="form-control" />
+              <button class="btn btn-danger mt-3" onclick="history.back()">
+                Batal
+              </button>
+              <button class="btn btn-primary mt-3" id="simpan">Simpan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      $(document).on("click", "#simpan", function () {
+        var pgw = new Object();
+        pgw.nip = $("#nip").val();
+        pgw.nama = $("#nama").val();
+        pgw.alamat = $("#alamat").val();
+
+        /* console.log(pgw); */
+        $.post("../backend/tambah.php", JSON.stringify(pgw)).done(function (
+          data
+        ) {
+          obj = JSON.parse(data);
+          console.log(obj);
+          if (obj.result == "success") {
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil.",
+              text: "Data berhasil disimpan",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "index.html";
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Gagal.",
+              text: "Data Gagal disimpan",
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

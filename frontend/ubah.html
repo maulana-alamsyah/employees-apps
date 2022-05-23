@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Employees Apps</title>
+
+    <link href="../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body>
+    <div
+      class="container d-flex align-items-center vh-100 justify-content-center"
+    >
+      <div class="card w-50">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h1 class="text-center">
+                Formulir Ubah Data
+                <hr class="w-50 mx-auto mt-2 bg-dark" size="2" />
+              </h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label for="nip">NIP</label>
+              <input type="text" id="nip" class="form-control" readonly />
+              <label for="nama">Nama</label>
+              <input type="text" id="nama" class="form-control" />
+              <label for="alamat">Alamat</label>
+              <input type="text" id="alamat" class="form-control" />
+              <button class="btn btn-danger mt-3" onclick="history.back()">
+                Batal
+              </button>
+              <button class="btn btn-primary mt-3" id="simpan">Ubah</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      $(document).ready(function () {
+        var param = window.location.search;
+        var urlParam = new URLSearchParams(param);
+        var nip = urlParam.get("nip");
+        console.log(nip);
+
+        var data = new Object();
+        data.nip = nip;
+
+        $.post(
+          "../backend/get_by_nip.php",
+          JSON.stringify(data),
+          function (resp) {
+            var dataDetail = JSON.parse(resp);
+            $("#nip").val(dataDetail.nip);
+            $("#nama").val(dataDetail.nama);
+            $("#alamat").val(dataDetail.alamat);
+          }
+        );
+      });
+
+      $(document).on("click", "#simpan", function () {
+        var pgw = new Object();
+        pgw.nip = $("#nip").val();
+        pgw.nama = $("#nama").val();
+        pgw.alamat = $("#alamat").val();
+        console.log(pgw);
+        $.post("../backend/update.php", JSON.stringify(pgw), function (resp) {
+          console.log(resp);
+          var obj = JSON.parse(resp);
+          if (obj.result == "success") {
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil.",
+              text: "Data berhasil diubah",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "index.html";
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Gagal.",
+              text: "Data Gagal diubah",
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

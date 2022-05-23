@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Employees Apps</title>
+
+    <link href="../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <script
+      src="https://kit.fontawesome.com/5a6c86310d.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body>
+    <div class="container d-flex align-items-center vh-100">
+      <div class="card w-100">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h1 class="text-center">
+                Aplikasi Pegawai
+                <hr class="w-25 mx-auto mt-2 bg-dark" size="2" />
+              </h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-9">
+              <button class="btn btn-primary rounded-pill" id="btnTambah">
+                <i class="fa-solid fa-user-plus"></i> Tambah
+              </button>
+            </div>
+            <div class="col-md-3">
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="cari"
+                  class="form-control"
+                  placeholder="Cari..."
+                  aria-label="Cari..."
+                  aria-describedby="button-addon2"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="button-addon2"
+                >
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table table-responsive table-hover">
+                <thead>
+                  <tr>
+                    <th>NIP</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="isi"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/bootstrap/js/bootstrap.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      $(document).on("click", "#button-addon2", async function () {
+        var data = new Object();
+        var cari = $("#cari").val();
+
+        data.cari = cari;
+
+        console.log(JSON.stringify(data));
+
+        $.ajax({
+          url: "../backend/cari.php",
+          type: "POST",
+          data: JSON.stringify(data),
+          cache: false,
+          success: function (resp) {
+            result = JSON.parse(resp);
+            resultTag = "";
+            if (result != false) {
+              for (i = 0; i < result.length; i++) {
+                resultTag +=
+                  "<tr>" +
+                  "<td>" +
+                  result[i].nip +
+                  "</td>" +
+                  "<td>" +
+                  result[i].nama +
+                  "</td>" +
+                  "<td>" +
+                  result[i].alamat +
+                  "</td>" +
+                  '<td><button class="btn bg-danger" id="hapus" title="hapus" nip="' +
+                  result[i].nip +
+                  '"><i class="fa-solid fa-trash-can text-white"></i></button>&nbsp;' +
+                  '<button class="btn bg-primary" id="edit" title="edit" nip="' +
+                  result[i].nip +
+                  '"><i class="fa-solid fa-pen-to-square text-white"></i></button></td>' +
+                  "</tr>";
+              }
+              $("#isi").html(resultTag);
+            } else {
+              resultTag +=
+                "<tr>" +
+                "<td colspan='4' class='text-center'>Data Tidak Ditemukan :(</td>" +
+                "</tr>";
+              $("#isi").html(resultTag);
+            }
+          },
+          error: $("#isi").html(
+            "<tr><td colspan='4' class='text-center'><div class='spinner-border text-secondary' role='status'>" +
+              "<span class='visually-hidden'>Loading...</span>" +
+              "</div>" +
+              "</td></tr>"
+          ),
+        });
+      });
+      $(document).on("click", "#btnTambah", async function () {
+        window.location.href = "tambah.html";
+      });
+
+      $(document).ready(function () {
+        $.ajax({
+          url: "../backend/list_all.php",
+          type: "GET",
+          cache: false,
+          success: function (resp) {
+            result = JSON.parse(resp);
+            resultTag = "";
+            if (result != false) {
+              for (i = 0; i < result.length; i++) {
+                resultTag +=
+                  "<tr>" +
+                  "<td>" +
+                  result[i].nip +
+                  "</td>" +
+                  "<td>" +
+                  result[i].nama +
+                  "</td>" +
+                  "<td>" +
+                  result[i].alamat +
+                  "</td>" +
+                  '<td><button class="btn bg-danger" id="hapus" title="hapus" nip="' +
+                  result[i].nip +
+                  '"><i class="fa-solid fa-trash-can text-white"></i></button>&nbsp;' +
+                  '<button class="btn bg-primary" id="edit" title="edit" nip="' +
+                  result[i].nip +
+                  '"><i class="fa-solid fa-pen-to-square text-white"></i></button></td>' +
+                  "</tr>";
+              }
+              $("#isi").html(resultTag);
+            } else {
+              resultTag +=
+                "<tr>" +
+                "<td colspan='4' class='text-center'>Data Tidak Masih Kosong :)</td>" +
+                "</tr>";
+              $("#isi").html(resultTag);
+            }
+          },
+          error: $("#isi").html(
+            "<tr><td colspan='4' class='text-center'><div class='spinner-border text-secondary' role='status'>" +
+              "<span class='visually-hidden'>Loading...</span>" +
+              "</div>" +
+              "</td></tr>"
+          ),
+        });
+      });
+
+      $(document).on("click", "#hapus", function () {
+        var nip = $(this).attr("nip");
+        Swal.fire({
+          title: "Hapus data dengan nip " + nip + "?",
+          icon: "warning",
+          showCancelButton: true,
+          cancelButtonText: "Batal",
+          confirmButtonText: "Hapus",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log(nip);
+            var param = new Object();
+            param.nip = nip;
+            $.post(
+              "../backend/hapus.php",
+              JSON.stringify(param),
+              function (resp) {
+                var obj = JSON.parse(resp);
+                if (obj.status == "success") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Berhasil.",
+                    text: "Data berhasil dihapus",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = "index.html";
+                    }
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Gagal.",
+                    text: "Data Gagal dihapus",
+                  });
+                }
+              }
+            );
+          }
+        });
+      });
+
+      $(document).on("click", "#edit", function () {
+        var nip = $(this).attr("nip");
+        window.location.href = "./ubah.html?nip=" + nip;
+      });
+    </script>
+  </body>
+</html>
